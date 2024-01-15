@@ -1,12 +1,7 @@
 import { useState, KeyboardEvent } from "react";
-import { initialItems } from "../constant";
-import { Item } from "../types";
 
-interface SearchState {
-  items: Item[];
-  selectedItems: Item[];
-  highlightedIndex: number | null;
-}
+import { initialItems } from "../constant";
+import { Item, SearchState } from "../types";
 
 const Search = () => {
   const [state, setState] = useState<SearchState>({
@@ -83,7 +78,7 @@ const Search = () => {
           placeholder="Type to search..."
         />
       </div>
-      {inputValue && (
+      {inputValue ? (
         <ul className="absolute w-full max-w-xs mt-1 border border-gray-300 bg-white rounded shadow-lg">
           {filteredItems.map((item) => (
             <li
@@ -95,7 +90,7 @@ const Search = () => {
             </li>
           ))}
         </ul>
-      )}
+      ) : null}
     </div>
   );
 };
