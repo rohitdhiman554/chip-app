@@ -2,48 +2,70 @@ import { useState, KeyboardEvent } from "react";
 import { initialItems } from "../constant";
 import { Item } from "../types";
 
+interface SearchState {
+  items: Item[];
+  selectedItems: Item[];
+  highlightedIndex: number | null;
+}
+
 const Search = () => {
-  const [items, setItems] = useState<Item[]>(initialItems);
+  const [state, setState] = useState<SearchState>({
+    items: initialItems,
+    selectedItems: [],
+    highlightedIndex: null,
+  });
   const [inputValue, setInputValue] = useState("");
-  const [selectedItems, setSelectedItems] = useState<Item[]>([]);
-  const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
 
   const handleSelectItem = (item: Item) => {
-    setSelectedItems([...selectedItems, item]);
-    setItems(items.filter((i) => i !== item));
+    setState({
+      ...state,
+      selectedItems: [...state.selectedItems, item],
+      items: state.items.filter((i) => i !== item),
+      highlightedIndex: null,
+    });
     setInputValue("");
-    setHighlightedIndex(null);
   };
 
   const handleRemoveItem = (item: Item) => {
-    setSelectedItems(selectedItems.filter((i) => i !== item));
-    setItems([...items, item]);
-    setHighlightedIndex(null);
+    setState({
+      ...state,
+      selectedItems: state.selectedItems.filter((i) => i !== item),
+      items: [...state.items, item],
+      highlightedIndex: null,
+    });
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Backspace" && inputValue === "") {
+      const { selectedItems, highlightedIndex } = state;
       if (highlightedIndex !== null) {
-        handleRemoveItem(selectedItems[highlightedIndex]);
-        setHighlightedIndex(null);
+        const newItem = selectedItems[highlightedIndex];
+        setState({
+          ...state,
+          selectedItems: selectedItems.filter(
+            (_, index) => index !== highlightedIndex
+          ),
+          items: [...state.items, newItem],
+          highlightedIndex: null,
+        });
       } else if (selectedItems.length > 0) {
-        setHighlightedIndex(selectedItems.length - 1);
+        setState({ ...state, highlightedIndex: selectedItems.length - 1 });
       }
     }
   };
 
-  const filteredItems = items.filter((item) =>
+  const filteredItems = state.items.filter((item) =>
     item.toLowerCase().includes(inputValue.toLowerCase())
   );
 
   return (
     <div className="w-full max-w-xs">
       <div className="flex flex-wrap gap-2 p-2 border border-gray-300 rounded">
-        {selectedItems.map((item, index) => (
+        {state.selectedItems.map((item, index) => (
           <div
             key={item}
             className={`flex items-center gap-2 px-3 py-1 rounded ${
-              highlightedIndex === index ? "bg-blue-300" : "bg-blue-500"
+              state.highlightedIndex === index ? "bg-blue-300" : "bg-blue-500"
             } text-white`}
           >
             {item}
@@ -57,11 +79,11 @@ const Search = () => {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-1"
+          className="flex-1 focus:outline-none"
           placeholder="Type to search..."
         />
       </div>
-      {inputValue ? (
+      {inputValue && (
         <ul className="absolute w-full max-w-xs mt-1 border border-gray-300 bg-white rounded shadow-lg">
           {filteredItems.map((item) => (
             <li
@@ -73,7 +95,7 @@ const Search = () => {
             </li>
           ))}
         </ul>
-      ) : null}
+      )}
     </div>
   );
 };
