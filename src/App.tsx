@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+
 import "./App.css";
 import Search from "./component/Search";
 
