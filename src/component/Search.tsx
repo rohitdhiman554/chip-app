@@ -1,15 +1,9 @@
-import React, { useState, KeyboardEvent } from "react";
-
-type Item = string;
+import { useState, KeyboardEvent } from "react";
+import { initialItems } from "../constant";
+import { Item } from "../types";
 
 const Search = () => {
-  const [items, setItems] = useState<Item[]>([
-    "Apple",
-    "Banana",
-    "Cherry",
-    "Date",
-    "Elderberry",
-  ]);
+  const [items, setItems] = useState<Item[]>(initialItems);
   const [inputValue, setInputValue] = useState("");
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
